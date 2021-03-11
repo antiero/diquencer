@@ -10,12 +10,16 @@ from .models import Position
 
 class SequencerEngine(Thread):
     def __init__(
-        self, sequence, midi_wrapper, start_callback=None, error_callback=None
+        self, sequence, midi_wrapper, 
+        start_callback=None, 
+        stop_callback=None,
+        error_callback=None
     ):
         super().__init__()
         self._sequence = sequence
         self._midi = midi_wrapper
         self._start_callback = start_callback
+        self._stop_callback = stop_callback
         self._error_callback = error_callback
         self._pulsestamp = 0
         self._stop_event = Event()
@@ -51,6 +55,7 @@ class SequencerEngine(Thread):
         # Start
         if self._start_callback:
             self._start_callback()
+
         self._midi.start()
 
         # Consume events from queue
@@ -78,6 +83,9 @@ class SequencerEngine(Thread):
         self._sequence.reset()
 
     def stop(self):
+        # Stop
+        if self._stop_callback:
+            self._stop_callback()
         self._stop_event.set()
 
     def _pulse(self):

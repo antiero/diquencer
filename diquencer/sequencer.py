@@ -9,7 +9,11 @@ from .sequence import Sequence
 
 class Sequencer:
     def __init__(
-        self, midi_channel=1, start_callback=None, error_callback=None, sequence=None
+        self, midi_channel=1, 
+        start_callback=None, 
+        stop_callback=None, 
+        error_callback=None, 
+        sequence=None
     ):
         """
         When an error occurs, error_callback function will be execuded and exception
@@ -17,6 +21,7 @@ class Sequencer:
         """
         self._midi = MIDIWrapper(midi_channel)
         self._start_callback = start_callback
+        self._stop_callback = stop_callback
         self._error_callback = error_callback
         self._sequence = sequence
         self._sequence_data = None
@@ -102,7 +107,10 @@ class Sequencer:
             raise SequenceNotSet("Cannot start sequencer. Sequence is not set.")
 
         self._engine = SequencerEngine(
-            self._sequence, self._midi, self._start_callback, self._error_callback
+            self._sequence, self._midi, 
+            self._start_callback,
+            self._stop_callback,
+            self._error_callback
         )
         self._engine.start()
 
