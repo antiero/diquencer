@@ -44,8 +44,9 @@ class SequencerEngine(Thread):
         )
 
         # Warm-up (4 quarter notes)
-        for _ in range(24 * 4):
-            self._pulse()
+        # NOTE: this seems to add a considerable delay when calling start.
+        #for _ in range(24 * 4):
+        #    self._pulse()
 
         # Start
         if self._start_callback:
