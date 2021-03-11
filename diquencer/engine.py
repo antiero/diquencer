@@ -13,6 +13,7 @@ class SequencerEngine(Thread):
         self, sequence, midi_wrapper, 
         start_callback=None, 
         stop_callback=None,
+        pattern_changed_callback=None,
         error_callback=None
     ):
         super().__init__()
@@ -20,6 +21,7 @@ class SequencerEngine(Thread):
         self._midi = midi_wrapper
         self._start_callback = start_callback
         self._stop_callback = stop_callback
+        self._pattern_changed_callback = pattern_changed_callback
         self._error_callback = error_callback
         self._pulsestamp = 0
         self._stop_event = Event()
@@ -113,6 +115,9 @@ class SequencerEngine(Thread):
         except InvalidBank as error:
             self._cleanup_after_abort(error)
             raise ChangePatternError()
+        if self._pattern_changed_callback:
+            self._pattern_changed_callback(pattern)
+            
         logging.info(f"[{self.position}] Changing pattern to {pattern}.")
         self.current_pattern = pattern
         self.next_pattern = self._sequence.next_pattern
